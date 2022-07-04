@@ -10,15 +10,16 @@ public class SearchUserExcel {
 
     private static List<String> v_cpf = new ArrayList<>();
     private static List<String> v_rg = new ArrayList<>();
-
+    // Inicializando variáveis do resultado 
+    
     public static void main(String[] args) {
 
-        List<String> cpf = getV_cpf();
+        List<String> cpf = getV_cpf(); // Lendo cpf (Apenas fictício, no caso pode ser um chamada de um REST, por exemplo)
         for (String eachCpf: getV_cpf()) {
             if (!havePatternCPF(eachCpf)) {
                 cpf.clear();
                 Log.e("SearchUserExcel", "O cpf " + eachCpf + " não está de acordo com o regras" +
-                        " de regex da receita federal.");
+                        " de regex da receita federal."); // Checando se o (os) CPF é válido
             }
         }
 
@@ -29,11 +30,12 @@ public class SearchUserExcel {
                             2,
                             new HashMap<>().put(2, 3),
                             new ArrayList<>()
-                    ));
-            v_cpf = captureAgencyAccount.searchCPF();
-            v_rg = captureAgencyAccount.searchRg();
+                    )); // Criando instância do objeto User, serve para facilitar a procura dele no banco de dados
+            
+            v_cpf = captureAgencyAccount.searchCPF(); // Chamando função que procura o CPF
+            v_rg = captureAgencyAccount.searchRg(); // Chamando função que procura o RG
 
-            Log.println(Log.INFO, "SearchUserExcel", "CPF: " + v_cpf + " RG: " + v_rg);
+            Log.println(Log.INFO, "SearchUserExcel", "CPF: " + v_cpf + " RG: " + v_rg); // print
         }
     }
 
@@ -43,10 +45,10 @@ public class SearchUserExcel {
 
     private static boolean havePatternCPF(String cpf) {
         return cpf != null && cpf.matches("([0-9]{2}[.]?[0-9]{3}[.]?[0-9]{3}[/]?[0-9]{4}" +
-                "[-]?[0-9]{2})|([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}[-]?[0-9]{2})");
+                "[-]?[0-9]{2})|([0-9]{3}[.]?[0-9]{3}[.]?[0-9]{3}[-]?[0-9]{2})"); // REGEX para validar CPF
     }
 
-    static class User {
+    static class User { // Objeto
 
         private final List<String> v_data;
         private Integer v_line;
@@ -86,25 +88,26 @@ public class SearchUserExcel {
     }
 }
 
+// TODOS: os HashMaps usados são para exemplificar o (CapturaCelula), pois naturalmente tem quase a mesma função
 class CaptureAgencyAccount {
 
     private final SearchUserExcel.User user;
-    private boolean nunException = true;
+    private boolean nunException = true; // boolean para se o CPF não existir
 
     public CaptureAgencyAccount(SearchUserExcel.User user) {
-        this.user = user;
+        this.user = user; // construtor
     }
 
     protected List<String> searchCPF(){
 
-        for (String cpf: user.getV_data()) {
+        for (String cpf: user.getV_data()) { // garante que todos os cpf passados serão checados no banco de dados
             cpf = new HashMap<>().put(user.getV_line(), 6) + "/"
-                    + new HashMap<>().put(user.getV_line(), 7);
+                    + new HashMap<>().put(user.getV_line(), 7); 
 
             while (user.getV_cell() != "") {
                 if (!user.getV_cell().equals(user.getV_agency_account())) {
                     user.getV_agency_account().add(cpf);
-                    nunException = false;
+                    nunException = false; // se existir o cpf
                 }
                 user.setV_line(user.getV_line() + 1);
                 user.setV_cell(new HashMap<>().put(user.getV_line(), 3));
@@ -115,14 +118,15 @@ class CaptureAgencyAccount {
         return user.getV_agency_account();
     }
 
-    public List<String> searchRg() {
-        for (String rg : user.getV_data()) {
+    protected List<String> searchRg() {
+        
+        for (String rg : user.getV_data()) { // garante que todos os cpf passados serão checados no banco de dados
             rg = (String) new HashMap<>().put(user.getV_line(), 4);
 
             while (user.getV_cell() != "") {
                 if (!user.getV_cell().equals(user.getV_agency_account())) {
                     user.getV_agency_account().add(rg);
-                    nunException = false;
+                    nunException = false; // se não existir rg
                 }
                 user.setV_line(user.getV_line() + 1);
                 user.setV_cell(new HashMap<>().put(user.getV_line(), 3));
