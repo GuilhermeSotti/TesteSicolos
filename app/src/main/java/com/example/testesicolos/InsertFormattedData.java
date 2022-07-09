@@ -18,6 +18,11 @@ enum ExampleData {
     private static ArrayList<String> list;
 
     ExampleData(@NonNull String... list) {
+        for (String value: list){
+            if(value.isEmpty()){
+                list = "NULL"; // Completando o resultado final caso o dado esteja nulo
+            }
+        }
         getList().addAll(Arrays.asList(list)); // Transforma cada tabela eu um ArrayList<String>()
     }
 
@@ -30,13 +35,10 @@ public class InsertFormattedData {
     public static void main(String[] args) {
 
         ArrayList<String> result = new ArrayList<>();
-        int index;
+        int index = 0;
         // Iniciando valores para o Loop
         
         for (String list: getData("NAME")){ // Separando cada dado da tabela (Cada vetor do Array("NAME") fará o loop separadamente)
-            index = 0;
-            if (list.isEmpty())
-                list = "NULL"; // Completando o resultado final caso o dado esteja nulo
             result.add(list + ";");
             result.add(getData("EMAIL").get(index) + ";");
             result.add(getData("RESULT").get(index) + "||"); // Fazendo o insert de todos dados com o mesmo id do vetor e adicionando os separadores ";" e "||"
